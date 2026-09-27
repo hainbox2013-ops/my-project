@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Chat Bot</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="chat">
+    <header><div class="logo">✦</div><div><h1>AI Assistant</h1><p>Online • Ready to help</p></div></header>
+    <section id="messages" class="messages">
+      <div class="msg bot">Hi! 👋 I'm your AI assistant. How can I help you?</div>
+    </section>
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="Type your message..." required>
+      <button>➤</button>
+    </form>
+  </main>
+<script>
+const form=document.querySelector("#form"), input=document.querySelector("#input"), messages=document.querySelector("#messages");
+function add(text,who){const d=document.createElement("div");d.className="msg "+who;d.textContent=text;messages.appendChild(d);messages.scrollTop=messages.scrollHeight;}
+form.addEventListener("submit",async e=>{
+  e.preventDefault(); const text=input.value.trim(); if(!text)return;
+  add(text,"user"); input.value=""; input.disabled=true;
+  const loading=document.createElement("div"); loading.className="msg bot"; loading.textContent="Thinking…"; messages.appendChild(loading);
+  try{
+    const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text})});
+    const data=await r.json(); loading.textContent=data.reply||data.error||"Something went wrong.";
+  }catch{loading.textContent="Connection error. Try again."}
+  input.disabled=false; input.focus();
+});
+</script>
+</body>
+</html>
