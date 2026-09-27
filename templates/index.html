@@ -1,34 +1,40 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Chat Bot</title>
-  <link rel="stylesheet" href="/static/style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nova AI</title>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <main class="chat">
-    <header><div class="logo">✦</div><div><h1>AI Assistant</h1><p>Online • Ready to help</p></div></header>
-    <section id="messages" class="messages">
-      <div class="msg bot">Hi! 👋 I'm your AI assistant. How can I help you?</div>
-    </section>
-    <form id="form">
-      <input id="input" autocomplete="off" placeholder="Type your message..." required>
-      <button>➤</button>
-    </form>
-  </main>
+<main class="chat">
+<header>
+  <div class="brand-icon"><span>✦</span></div>
+  <div class="brand"><h1>Nova AI</h1><p><i></i> Online & ready to help</p></div>
+  <button class="new-chat" id="clear" title="New chat">＋</button>
+</header>
+<section id="messages" class="messages">
+  <div class="welcome">
+    <div class="welcome-icon">✦</div>
+    <h2>How can I help you?</h2>
+    <p>Ask me anything and let's get started.</p>
+  </div>
+</section>
+<form id="form">
+  <input id="input" autocomplete="off" placeholder="Message Nova AI..." required>
+  <button class="send" aria-label="Send">➤</button>
+</form>
+</main>
 <script>
-const form=document.querySelector("#form"), input=document.querySelector("#input"), messages=document.querySelector("#messages");
+const form=document.querySelector("#form"),input=document.querySelector("#input"),messages=document.querySelector("#messages"),clear=document.querySelector("#clear");
 function add(text,who){const d=document.createElement("div");d.className="msg "+who;d.textContent=text;messages.appendChild(d);messages.scrollTop=messages.scrollHeight;}
+function removeWelcome(){const w=document.querySelector(".welcome");if(w)w.remove();}
+clear.onclick=()=>{messages.innerHTML='<div class="welcome"><div class="welcome-icon">✦</div><h2>How can I help you?</h2><p>Ask me anything and let\'s get started.</p></div>';input.focus();};
 form.addEventListener("submit",async e=>{
-  e.preventDefault(); const text=input.value.trim(); if(!text)return;
-  add(text,"user"); input.value=""; input.disabled=true;
-  const loading=document.createElement("div"); loading.className="msg bot"; loading.textContent="Thinking…"; messages.appendChild(loading);
-  try{
-    const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text})});
-    const data=await r.json(); loading.textContent=data.reply||data.error||"Something went wrong.";
-  }catch{loading.textContent="Connection error. Try again."}
-  input.disabled=false; input.focus();
+ e.preventDefault();const text=input.value.trim();if(!text)return;removeWelcome();add(text,"user");input.value="";input.disabled=true;
+ const loading=document.createElement("div");loading.className="msg bot";loading.textContent="Thinking…";messages.appendChild(loading);
+ try{const r=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text})});const data=await r.json();loading.textContent=data.reply||data.error||"Something went wrong.";}
+ catch{loading.textContent="Connection error. Try again."} input.disabled=false;input.focus();
 });
 </script>
 </body>
